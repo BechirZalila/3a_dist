@@ -1,0 +1,163 @@
+/* $Id$ */
+
+/**
+ * Cet exemple illustre l'application classique "Le diner des
+ * philosophes" en utilisant le modèle de composants CORBA.
+ *
+ * On realise un composant pour modéliser chaque fourchette et chaque
+ * philosophe.
+ *
+ * Le composant Philosoqphe réflechit, dort, mange, etc. Pour manger,
+ * un philosophe est connecté à deux Composants fourchette qu'il devra
+ * acquérir.
+ *
+ * Durant son exécution, le philosophe publie son état d'une manière
+ * asynchrone vers un composant observateur.
+ */
+
+// Importation du module Components qui contient des définition
+// nécessaires pour la réalisation d'une application CCM.
+
+import Components;
+
+module DinerDesPhilosophes 
+{
+  /******************************************************************
+   ************************* FOURCHETTE *****************************
+   ******************************************************************/
+
+  /**
+   * Exception lancée par une fourchette si on essaie de la récupérer
+   * alors qu'un autre philosophe la dértient déjà.
+   */
+  exception Utilisee {};
+  
+  /**
+   * Interface décrivant la manière dont une fourchette est utilisée
+   */
+  interface Fourchette
+  {
+    /**
+     * Obtention de la fourchette.
+     *
+     * @exception Utilisee lancée si la fourchette est déjà prise par
+     * un autre philosophe.
+     */
+    void prendre () raises (Utilisee);
+    
+    /**
+     * Libère la fourchette
+     */
+    void liberer ();
+  };
+  
+  /**
+   * Ce composant fournit une fourchette pour être utilisée par les
+   * philosophes.
+   */
+  component FourchetteManager
+  {
+    /** La facette Fourchette utiliser par les philosophes */
+    provides Fourchette la_fourchette;
+  };
+  
+  /**
+   * Un home simple pour instancier les fourchettes
+   */
+  home FourchetteHome manages FourchetteManager {};
+  
+  /******************************************************************
+   ************************* PHILOSOPHE *****************************
+   ******************************************************************/
+
+  /**
+   * Durant sa vie, un philosophe suit les états suivants: MANGE,
+   * REFLECHIT, A_FAIM, AFFAME, MORT.
+   */
+  enum EtatPhilosophe
+  {
+    MANGE,
+    REFLECHIT,
+    A_FAIM,
+    AFFAME,
+    MORT
+  };
+
+  /**
+   * Cet évènement est lancé par les philosophes pour signaler leur
+   * état.
+   */
+  eventtype InfoEtat
+  {
+    /** Nom du philosophe */
+    public string nom;
+
+    /** Etat courant du philosophe */
+    public EtatPhilosophe _etat;
+
+    /** Temps ecoulé depuis le dernier repas.*/
+    public unsigned long ticks_depuis_dernier_repas;
+
+    /** Est ce que le philosophe possède la fourchette gauche? */
+    public boolean a_fourchette_gauche;
+
+    /** Est ce que le philosophe possède la fourchette droite? */
+    public boolean a_fourchette_droite;
+  };
+
+  /**
+   * Le composant Philosophe
+   *
+   * Un philosophe possède un nom
+   */
+  component Philosophe
+  {
+    /** Un nom peut être obtenu est modifié */
+    attribute string nom;
+
+    /** Un philosophe peut utiliser une fourchette avec sa main
+	gauche */
+    uses Fourchette gauche;
+
+    /** Un philosophe peut utiliser une fourchette avec sa main
+	droite */
+    uses Fourchette droite;
+     
+    /** Un philosophe envoie des évènement pour signaler son
+	absence. */
+    publishes InfoEtat info;
+  };
+
+  /**
+   * Un home simple pour instancier les composants Philosophe
+   */
+  home PhilosopheHome manages Philosophe
+  {
+    /**
+     * Une opération pour créer un philosophe à partir de son nom
+     *
+     * @param nom Le nom du philosophe
+     */
+    factory nouveau (in string nom);
+  };
+
+  /******************************************************************
+   ************************* OBSERVATEUR ****************************
+   ******************************************************************/
+
+  /**
+   * Le composant Observateur observe l'état des philosophes
+   */
+  component Observateur
+  {
+    /** Un puits d'évènements pour recevoir les états des
+	philosophes. */
+    consumes InfoEtat info;
+  };
+    
+  /**
+   * Un home simple pour instancier les observateurs
+   */
+  home ObservateurHome manages Observateur {};   
+
+};

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE componentassembly PUBLIC "-//OMG//DTD Component Assembly Descriptor 3.0//EN" "http://openccm.objectweb.org/dtd/ccm/componentassembly.dtd">
+<componentassembly derivedfrom="" id="DinerDesPhilosophes">
+  <componentfiles>
+    <componentfile type="CORBA Component" id="PhilosopheCSD">
+      <fileinarchive name="META-INF/philosophe.csd">
+        <link href="archives/philosophe.car" xml:link="SIMPLE"/>
+      </fileinarchive>
+    </componentfile>
+    <componentfile type="CORBA Component" id="ObservateurCSD">
+      <fileinarchive name="META-INF/observateur.csd">
+	<link href="archives/observateur.car" xml:link="SIMPLE"/>
+      </fileinarchive>
+    </componentfile>
+    <componentfile type="CORBA Component" id="FourchetteManagerCSD">
+      <fileinarchive name="META-INF/fourchettemanager.csd">
+	<link href="archives/fourchettemanager.car" xml:link="SIMPLE"/>
+      </fileinarchive>
+    </componentfile>
+  </componentfiles>
+  <partitioning>
+    <homeplacement cardinality="1" id="PhilosopheHome">
+      <componentfileref idref="PhilosopheCSD"/>
+      <componentimplref idref="PhilosopheImpl"/>
+      <registerwithnaming name="demo/diner/PhilosopheHome"/>
+      <componentinstantiation id="Nietzsche">
+        <componentproperties>
+          <fileinarchive name="META-INF/nietzsche.cpf">
+          </fileinarchive>
+        </componentproperties>
+        <registercomponent>
+          <registerwithnaming name="demo/diner/Nietzsche"/>
+        </registercomponent>
+      </componentinstantiation>
+      <componentinstantiation id="Kant">
+        <componentproperties>
+          <fileinarchive name="META-INF/kant.cpf">
+          </fileinarchive>
+        </componentproperties>
+        <registercomponent>
+          <registerwithnaming name="demo/diner/Kant"/>
+        </registercomponent>
+      </componentinstantiation>
+      <componentinstantiation id="Socrate">
+        <componentproperties>
+          <fileinarchive name="META-INF/socrate.cpf">
+          </fileinarchive>
+        </componentproperties>
+        <registercomponent>
+          <registerwithnaming name="demo/diner/Socrate"/>
+        </registercomponent>
+      </componentinstantiation>
+      <componentinstantiation id="Platon">
+        <componentproperties>
+          <fileinarchive name="META-INF/platon.cpf">
+          </fileinarchive>
+        </componentproperties>
+        <registercomponent>
+          <registerwithnaming name="demo/diner/Platon"/>
+        </registercomponent>
+      </componentinstantiation>
+      <componentinstantiation id="Aristote">
+        <componentproperties>
+          <fileinarchive name="META-INF/aristote.cpf">
+          </fileinarchive>
+        </componentproperties>
+        <registercomponent>
+          <registerwithnaming name="demo/diner/Aristote"/>
+        </registercomponent>
+      </componentinstantiation>
+      <componentinstantiation id="Descartes">
+        <componentproperties>
+          <fileinarchive name="META-INF/descartes.cpf">
+          </fileinarchive>
+        </componentproperties>
+        <registercomponent>
+          <registerwithnaming name="demo/diner/Descartes"/>
+        </registercomponent>
+      </componentinstantiation>
+<!-- =============================================== -->
+<!--                                                 -->
+<!-- Warning following is OpenCCM/IST COACH specific -->
+<!-- as the OMG CCM spec. is under specified.        -->
+<!--                                                 -->
+<!-- =============================================== -->
+      <destination>
+        <installation type="componentinstallation">
+          <findby>
+            <namingservice name="ComponentServer1"/>
+          </findby>
+        </installation>
+        <activation type="componentserver">
+          <findby>
+            <namingservice name="ComponentServer1"/>
+          </findby>
+        </activation>
+      </destination>
+<!-- =============================================== -->
+<!--                                                 -->
+<!-- =============================================== -->
+    </homeplacement>
+    <hostcollocation cardinality="1" id="MN">
+      <homeplacement cardinality="1" id="FourchetteManagerHome">
+        <componentfileref idref="FourchetteManagerCSD"/>
+        <componentimplref idref="FourchetteManagerImpl"/>
+        <registerwithnaming name="demo/diner/FourchetteManagerHome"/>
+        <componentinstantiation id="Fourchette-1">
+        </componentinstantiation>
+        <componentinstantiation id="Fourchette-2">
+        </componentinstantiation>
+        <componentinstantiation id="Fourchette-3">
+        </componentinstantiation>
+        <componentinstantiation id="Fourchette-4">
+        </componentinstantiation>
+        <componentinstantiation id="Fourchette-5">
+        </componentinstantiation>
+        <componentinstantiation id="Fourchette-6">
+        </componentinstantiation>
+      </homeplacement>
+      <homeplacement cardinality="1" id="ObservateurHome">
+        <componentfileref idref="ObservateurCSD"/>
+        <componentimplref idref="ObservateurImpl"/>
+        <registerwithnaming name="demo/diner/ObservateurHome"/>
+        <componentinstantiation id="Observateur">
+          <registercomponent>
+            <registerwithnaming name="demo/diner/Observateur"/>
+          </registercomponent>
+        </componentinstantiation>
+      </homeplacement>
+<!-- =============================================== -->
+<!--                                                 -->
+<!-- Warning following is OpenCCM/IST COACH specific -->
+<!-- as the OMG CCM spec. is under specified.        -->
+<!--                                                 -->
+<!-- =============================================== -->
+      <destination>
+        <node name="MainNode"/>
+      </destination>
+<!-- =============================================== -->
+<!--                                                 -->
+<!-- =============================================== -->
+    </hostcollocation>
+
+  </partitioning>
+  <connections>
+    <connectinterface id="descartes-fourchette1">
+      <usesport>
+        <usesidentifier>gauche</usesidentifier>
+        <componentinstantiationref idref="Descartes"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-1"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="descartes-fourchette2">
+      <usesport>
+        <usesidentifier>droite</usesidentifier>
+        <componentinstantiationref idref="Descartes"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-2"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="nietzsche-fourchette2">
+      <usesport>
+        <usesidentifier>gauche</usesidentifier>
+        <componentinstantiationref idref="Nietzsche"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-2"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="nietzsche-fourchette3">
+      <usesport>
+        <usesidentifier>droite</usesidentifier>
+        <componentinstantiationref idref="Nietzsche"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-3"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="kant-fourchette3">
+      <usesport>
+        <usesidentifier>gauche</usesidentifier>
+        <componentinstantiationref idref="Kant"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-3"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="kant-fourchette4">
+      <usesport>
+        <usesidentifier>droite</usesidentifier>
+        <componentinstantiationref idref="Kant"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-4"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="socrate-fourchette4">
+      <usesport>
+        <usesidentifier>gauche</usesidentifier>
+        <componentinstantiationref idref="Socrate"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-4"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="socrate-fourchette5">
+      <usesport>
+        <usesidentifier>droite</usesidentifier>
+        <componentinstantiationref idref="Socrate"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-5"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="platon-fourchette5">
+      <usesport>
+        <usesidentifier>gauche</usesidentifier>
+        <componentinstantiationref idref="Platon"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-5"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="platon-fourchette6">
+      <usesport>
+        <usesidentifier>droite</usesidentifier>
+        <componentinstantiationref idref="Platon"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-6"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="aristote-fourchette6">
+      <usesport>
+        <usesidentifier>gauche</usesidentifier>
+        <componentinstantiationref idref="Aristote"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-6"/>
+      </providesport>
+    </connectinterface>
+    <connectinterface id="aristote-fourchette1">
+      <usesport>
+        <usesidentifier>droite</usesidentifier>
+        <componentinstantiationref idref="Aristote"/>
+      </usesport>
+      <providesport>
+        <providesidentifier>la_fourchette</providesidentifier>
+        <componentinstantiationref idref="Fourchette-1"/>
+      </providesport>
+    </connectinterface>
+    <connectevent id="descartes-observateur">
+      <consumesport>
+        <consumesidentifier>info</consumesidentifier>
+        <componentinstantiationref idref="Observateur"/>
+      </consumesport>
+      <publishesport>
+        <publishesidentifier>info</publishesidentifier>
+        <componentinstantiationref idref="Descartes"/>
+      </publishesport>
+    </connectevent>
+    <connectevent id="nietzsche-observateur">
+      <consumesport>
+        <consumesidentifier>info</consumesidentifier>
+        <componentinstantiationref idref="Observateur"/>
+      </consumesport>
+      <publishesport>
+        <publishesidentifier>info</publishesidentifier>
+        <componentinstantiationref idref="Nietzsche"/>
+      </publishesport>
+    </connectevent>
+    <connectevent id="kant-observateur">
+      <consumesport>
+        <consumesidentifier>info</consumesidentifier>
+        <componentinstantiationref idref="Observateur"/>
+      </consumesport>
+      <publishesport>
+        <publishesidentifier>info</publishesidentifier>
+        <componentinstantiationref idref="Kant"/>
+      </publishesport>
+    </connectevent>
+    <connectevent id="socrate-observateur">
+      <consumesport>
+        <consumesidentifier>info</consumesidentifier>
+        <componentinstantiationref idref="Observateur"/>
+      </consumesport>
+      <publishesport>
+        <publishesidentifier>info</publishesidentifier>
+        <componentinstantiationref idref="Socrate"/>
+      </publishesport>
+    </connectevent>
+    <connectevent id="platon-observateur">
+      <consumesport>
+        <consumesidentifier>info</consumesidentifier>
+        <componentinstantiationref idref="Observateur"/>
+      </consumesport>
+      <publishesport>
+        <publishesidentifier>info</publishesidentifier>
+        <componentinstantiationref idref="Platon"/>
+      </publishesport>
+    </connectevent>
+    <connectevent id="aristote-observateur">
+      <consumesport>
+        <consumesidentifier>info</consumesidentifier>
+        <componentinstantiationref idref="Observateur"/>
+      </consumesport>
+      <publishesport>
+        <publishesidentifier>info</publishesidentifier>
+        <componentinstantiationref idref="Aristote"/>
+      </publishesport>
+    </connectevent>
+  </connections>
+</componentassembly>

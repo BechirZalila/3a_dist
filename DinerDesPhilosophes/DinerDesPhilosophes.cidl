@@ -1,0 +1,31 @@
+import ::DinerDesPhilosophes;
+
+module DinerDesPhilosophes
+{
+    composition session PhilosopheSessionComposition
+    {
+        home executor PhilosopheSessionHome_impl
+        {
+            implements DinerDesPhilosophes::PhilosopheHome;
+            manages PhilosopheSession_impl;
+        };
+    };
+
+    composition session FourchetteManagerSessionComposition
+    {
+        home executor FourchetteManagerHome_impl
+        {
+            implements DinerDesPhilosophes::FourchetteHome;
+            manages FourchetteManagerSession_impl;
+        };
+    };
+
+    composition service ObservateurServiceComposition
+    {
+        home executor ObservateurHome_impl
+        {
+            implements DinerDesPhilosophes::ObservateurHome;
+            manages ObservateurService_impl;
+        };
+    };
+};

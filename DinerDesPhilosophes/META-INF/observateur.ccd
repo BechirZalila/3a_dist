@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE corbacomponent PUBLIC "-//OMG//DTD CORBA Component Descriptor 3.0//EN" "http://openccm.objectweb.org/dtd/ccm/corbacomponent.dtd">
+<corbacomponent>
+  <corbaversion>3.0</corbaversion>
+  <componentrepid repid="IDL:DinerDesPhilosophes/Observateur:1.0"/>
+  <homerepid repid="IDL:DinerDesPhilosophes/ObservateurHome:1.0"/>
+  <componentkind>
+    <session>
+      <servant lifetime="component"/>
+    </session>
+  </componentkind>
+  <security rightscombinator="secanyrights" rightsfamily="CORBA">
+  </security>
+  <threading policy="multithread"/>
+  <configurationcomplete set="true"/>
+  <segment segmenttag="1" name="observateurseg">
+    <segmentmember facettag="1"/>
+  </segment>
+  <homefeatures name="ObservateurHome" repid="IDL:DinerDesPhilosophes/ObservateurHome:1.0">
+  </homefeatures>
+  <componentfeatures name="Observateur" repid="IDL:DinerDesPhilosophes/Observateur:1.0">
+    <ports>
+      <consumes eventtype="InfoEtat" consumesname="info">
+        <eventpolicy policy="normal"/>
+      </consumes>
+    </ports>
+  </componentfeatures>
+</corbacomponent>

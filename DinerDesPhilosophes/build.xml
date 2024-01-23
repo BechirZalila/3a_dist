@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<project name="DinerDesPhilosophes" default="all" basedir=".">
+  <description>
+    Construit l'exemple Diner des Philosophers.
+  </description>
+
+  <!-- Pour permettre l'utilisation des variables d'environnement -->
+  <property environment="user.environment"/>
+
+  <!-- Propriètés de l'application -->
+  <property file="diner.properties" />
+
+  <import file="${user.environment.OpenCCM_HOMEDIR}/ant/openccm.xml"/>
+
+  <!-- CLASSPATH de l'ORB -->
+  <path id="orb.classpath">
+    <pathelement path="${user.environment.ORB_HOMEDIR}/classes"/>
+  </path>
+
+  <!-- CLASSPATH glonbal -->
+  <path id="project.class.path">
+
+    <path refid="orb.classpath" />
+
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/OpenCCM_Runtime.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/OpenCCM_Platform.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/CORBA.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/OpenCCM_Plugins.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/OpenCCM_Utils.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/OpenCCM_Deployment.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/ow_util_explorer.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/ow_ccm_explorer.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/ow_openccm_production.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/ots/jdbc2_0-stdext.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/ots/jta_1.0.1.jar" />
+    <pathelement path="${OpenCCM_HOMEDIR}/lib/ots/openorb_ots-1.3.0.jar" />
+  </path>
+  
+  <!-- ================================================================== -->
+  <!-- La règle principale                                                -->
+  <!-- ================================================================== -->
+
+  <target name="all" depends="etape4" />
+
+  <!-- ================================================================== -->
+  <!-- Les étapes principales                                             -->
+  <!-- ================================================================== -->
+
+  <target name="app_archives" depends="etape4"/>
+
+  <target name="etape0" depends="-antcontrib.init">
+    <echo message=" * Etape 0: nettoyage" />
+    <antcall target="application_clean" />
+  </target>
+
+  <target name="etape1" depends="etape0">
+    <echo message="" />
+    <echo message=" * Etape 1: Initialisation" />
+    <antcall target="creer_dossiers" />
+  </target>
+
+  <target name="etape2" depends="etape1,openccm_tasks">
+    <echo message="" />
+    <echo message=" * Etape 2: Generation" />
+    <antcall target="generer_squelettes" />
+    <antcall target="generer_souches" />
+  </target>
+
+  <target name="etape3" depends="etape2">
+    <echo message="" />
+    <echo message=" * Etape 3: Compilation" />
+    <antcall target="compiler_souches" />
+    <antcall target="compiler_squelettes" />
+    <antcall target="compiler_implantations" />
+  </target>
+
+  <target name="etape4" depends="etape3">
+    <echo message="" />
+    <echo message=" * Etape 4: Archivage (FIN)" />
+    <antcall target="construire_jar" />
+    <antcall target="construire_car"/>
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- Nettoyage                                                          -->
+  <!-- ================================================================== -->
+
+  <target name="application_clean">
+    <echo message="  ==> Nettoyage de &lt;${application.name}&gt;" />
+    <delete dir="${application.archives.dir}"
+	    includeEmptyDirs="true" 
+	    failonerror="false" />
+    <delete dir="${application.gen.dir}" 
+	    includeEmptyDirs="true" 
+	    failonerror="false" />
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- Création des dossiers.                                             -->
+  <!-- ================================================================== -->
+
+  <target name="creer_dossiers">
+    <echo message="  ==> Creation des dossiers" />
+    <mkdir dir="${application.gen.dir}" />
+    <mkdir dir="${application.gen.idl.dir}" />
+    <mkdir dir="${application.gen.stubs.dir}" />
+    <mkdir dir="${application.gen.skel.dir}" />
+    <mkdir dir="${application.class.dir}" />
+    <mkdir dir="${application.dependencies.dir}" />
+    <mkdir dir="${application.archives.dir}" />
+    <mkdir dir="${application.class.dir}" />
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- Generation des fichiers IDL2 et des squelettes OpenCCM             -->
+  <!-- ================================================================== -->
+
+  <target name="generer_squelettes">
+    <openccm>
+      <ir3_feed>
+        <file name="${application.root.dir}/${application.idl3.name}"/>
+        <cpp>
+          <includepath name="${OpenCCM_HOMEDIR}/idl"/>
+        </cpp>
+      </ir3_feed>
+      
+      <ir3_idl2 scope="::${application.name}"
+                destfile="${application.gen.idl.dir}/${application.idl2.name}">
+      </ir3_idl2>
+      
+      <ir3_java scope="::${application.name}"
+                destdir="${application.gen.skel.dir}" />
+      
+      <cidl_cif file="${application.root.dir}/${application.cidl.name}"
+                destfile="${application.gen.idl.dir}/${application.idl2.cif.name}"
+                destdir="${application.gen.skel.dir}"
+                dependenciesdir="${application.dependencies.dir}">
+        <userinclude name="${application.idl2.local.name}"/>
+      </cidl_cif>
+   </openccm>
+  </target>
+
+  <!-- ================================================================== -->
+  <!-- Generation des souches CORBA                                       -->
+  <!-- ================================================================== -->
+
+  <target name="generer_souches">
+    <echo message="  ==> Generation des souches pour ${application.name}" />
+    <!-- Interfaces distantes -->
+
+    <idl2java file="${application.gen.idl.dir}/${application.idl2.name}"
+              destdir="${application.gen.stubs.dir}"
+              includes="${application.gen.idl.dir},${OpenCCM_HOMEDIR}/idl">
+    </idl2java>
+
+    <!-- Interfaces locales -->
+
+    <idl2java file="${application.gen.idl.dir}/${application.idl2.local.name}"
+              destdir="${application.gen.stubs.dir}"
+              includes="${application.gen.idl.dir},${OpenCCM_HOMEDIR}/idl">
+    </idl2java>
+
+    <!-- Interfaces CIF -->
+    <idl2java file="${application.gen.idl.dir}/${application.idl2.cif.name}"
+              destdir="${application.gen.stubs.dir}"
+              includes="${application.gen.idl.dir},${OpenCCM_HOMEDIR}/idl">
+    </idl2java>
+  </target>
+
+   <!-- ================================================================== -->
+   <!-- Compilation des souches                                            -->
+   <!-- ================================================================== -->
+
+   <target name="compiler_souches">
+     <echo message="  ==> Compilation des souches." />
+     <antcall target="openccm.javac">
+       <param name="srcdir" value="${application.gen.stubs.dir}" />
+       <param name="destdir" value="${application.class.dir}" />
+       <param name="files" value="${application.pkg.dir}/**/*.java" />
+     </antcall>
+   </target>
+   
+   <!-- ================================================================== -->
+   <!-- Compilation des squelettes                                         -->
+   <!-- ================================================================== -->
+   
+   <target name="compiler_squelettes">
+     <echo message="  ==> Compilation des squelettes." />
+     <antcall target="openccm.javac">
+       <param name="srcdir" value="${application.gen.skel.dir}" />
+       <param name="destdir" value="${application.class.dir}" />
+       <param name="files" value="${application.pkg.dir}/**/*.java" />
+     </antcall>
+   </target>
+   
+   <!-- ================================================================== -->
+   <!-- Compilation des implantations                                      -->
+   <!-- ================================================================== -->
+   
+   <target name="compiler_implantations">
+     <echo message="  ==> Compilation des implantations." />
+     <antcall target="openccm.javac">
+       <param name="srcdir" value="${application.src.dir}" />
+       <param name="destdir" value="${application.class.dir}" />
+       <param name="files" value="**/*.java" />
+     </antcall>
+   </target>
+   
+   <!-- ================================================================== -->
+   <!-- Cible commune de compilation                                       -->
+   <!-- ================================================================== -->
+   
+   <target name="openccm.javac">
+     <javac failonerror="true"
+            srcdir="${srcdir}"
+            destdir="${destdir}"
+            debug="${javac.debug}">
+       <classpath refid="project.class.path" />
+       <include name="${files}" />
+     </javac>
+   </target>
+   
+   <!-- ================================================================== -->
+   <!-- Construction des fichiers JAR                                      -->
+   <!-- ================================================================== -->
+
+   <target name="construire_jar">
+     <echo message="  ==> Construction de ${application.archives.dir}/${diner.philosophe.jar.name}" />
+     <jar destfile="${application.archives.dir}/${diner.philosophe.jar.name}" >
+
+       <fileset dir="${application.class.dir}"
+		includesfile="${application.dependencies.dir}/PhilosopheSessionComposition.dep" />
+
+       <fileset dir="${application.class.dir}">
+	 <include name="${application.pkg.dir}/InfoEtatFactoryImpl.class"/>
+	 <include name="${application.pkg.dir}/InfoEtatImpl.class"/>
+	 <include name="${application.pkg.dir}/PhilosopheSessionComposition/PhilosopheImpl.class"/>
+	 <include name="${application.pkg.dir}/PhilosopheSessionComposition/PhilosopheHomeImpl.class"/>
+       </fileset>
+       <fileset dir="${application.root.dir}/resources" />
+     </jar>
+
+     <echo message="  ==> Construction de ${application.archives.dir}/${diner.fourchette.jar.name}" />
+     <jar destfile="${application.archives.dir}/${diner.fourchette.jar.name}" >
+       <fileset dir="${application.class.dir}"
+		includesfile="${application.dependencies.dir}/FourchetteManagerSessionComposition.dep" />
+       <fileset dir="${application.class.dir}">
+	 <include name="${application.pkg.dir}/FourchetteManagerSessionComposition/FourchetteHomeImpl.class"/>
+	 <include name="${application.pkg.dir}/FourchetteManagerSessionComposition/FourchetteManagerImpl.class"/>
+       </fileset>
+       <fileset dir="${application.root.dir}/resources" />
+     </jar>
+
+     <echo message="  ==> Construction de ${application.archives.dir}/${diner.observateur.jar.name}" />
+     <jar destfile="${application.archives.dir}/${diner.observateur.jar.name}" >
+       <fileset dir="${application.class.dir}"
+		includesfile="${application.dependencies.dir}/ObservateurServiceComposition.dep" />
+       <fileset dir="${application.class.dir}">
+	 <include name="${application.pkg.dir}/InfoEtatFactoryImpl.class"/>
+	 <include name="${application.pkg.dir}/InfoEtatImpl.class"/>
+	 <include name="${application.pkg.dir}/ObservateurServiceComposition/ObservateurHomeImpl.class"/>
+	 <include name="${application.pkg.dir}/ObservateurServiceComposition/ObservateurImpl.class"/>
+	  <include name="${application.pkg.dir}/ObservateurServiceComposition/PhilosophePanel.class"/>
+       </fileset>
+       <fileset dir="${application.root.dir}/resources" />
+     </jar>
+
+     <!-- Création d'une archive JAR pour toute l'application -->
+     <echo message="  ==> Construction de ${application.archives.dir}/${application.name}.jar" />
+     <jar jarfile="${application.archives.dir}/${application.name}.jar">
+       <fileset dir="${application.class.dir}"/>
+       <fileset dir="${application.root.dir}/resources" />
+     </jar>
+   </target>
+
+   <!-- ================================================================== -->
+   <!-- Construction des fichiers CAR                                      -->
+   <!-- ================================================================== -->
+
+   <target name="construire_car">
+
+     <echo message="  ==> Construction de ${application.archives.dir}/observateur.car" />
+     <zip destfile="${application.archives.dir}/observateur.car">
+       <zipfileset dir="${application.archives.dir}/" prefix="archives" includes=" ${diner.observateur.jar.name}"/>
+       <zipfileset dir="${application.root.dir}/META-INF/" prefix="META-INF" includes="observateur.csd observateur.ccd"/>
+     </zip>        
+
+     <echo message="  ==> Construction de ${application.archives.dir}/philosophe.car" />
+     <zip destfile="${application.archives.dir}/philosophe.car">
+       <zipfileset dir="${application.archives.dir}/" prefix="archives" includes=" ${diner.philosophe.jar.name}"/>
+       <zipfileset dir="${application.root.dir}/META-INF/" prefix="META-INF" includes="philosophe.csd philosophe.ccd "/>
+     </zip>
+
+     <echo message="  ==> Building ${application.archives.dir}/fourchettemanager.car" />
+     <zip destfile="${application.archives.dir}/fourchettemanager.car">
+       <zipfileset dir="${application.archives.dir}/" prefix="archives" includes=" ${diner.fourchette.jar.name}"/>
+       <zipfileset dir="${application.root.dir}/META-INF/" prefix="META-INF" includes="fourchettemanager.csd fourchettemanager.ccd "/>
+     </zip>
+
+     <echo message="  ==> Construction de ${application.archives.dir}/${application.name}.aar" />
+     <zip destfile="${application.archives.dir}/${application.name}.aar">
+       <zipfileset dir="${application.archives.dir}/" prefix="archives" includes="observateur.car philosophe.car fourchettemanager.car"/>
+       <zipfileset dir="${application.root.dir}/META-INF/" prefix="META-INF" excludes="*.csd *.ccd"/>
+     </zip>
+   </target>
+
+</project>

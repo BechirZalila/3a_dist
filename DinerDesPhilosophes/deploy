@@ -1,0 +1,54 @@
+#! /bin/sh -f
+
+nom_application="DinerDesPhilosophes"
+
+# ==========================================
+# Arrêt de toute instance précédente de CCM
+# ==========================================
+
+./stop
+
+# ==================================
+# Installation de la plateforme CCM
+# ==================================
+
+ccm_install
+
+# ================================
+# Démarrage du service de nommage 
+# ================================
+
+ns_start
+
+# Stockage de l'IOR du servioce de nommage dans la variable ior_NS qui
+# sera utilisée par ccm_deploy
+#
+ior_NS=`ns_ior`
+
+# =====================================
+# Démarrage d'un serveur de composants
+# =====================================
+
+jcs_start ComponentServer1
+sleep 1
+
+# ===============================
+# Démarrage d'un neoud principal
+# ===============================
+
+dci_start DefaultDCI
+sleep 2
+factory_start DefaultFactory
+sleep 1
+node_start MainNode
+sleep 1
+
+# =======================================
+# Déploiement et début de l'application
+# =======================================
+
+echo "Deploiement de $nom_application"
+
+ccm_deploy archives/${nom_application}.aar
+
+echo "L'application $nom_application est déployée..."

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE corbacomponent PUBLIC "-//OMG//DTD CORBA Component Descriptor 3.0//EN" "http://openccm.objectweb.org/dtd/ccm/corbacomponent.dtd">
+<corbacomponent>
+  <corbaversion>3.0</corbaversion>
+  <componentrepid repid="IDL:DinerDesPhilosophes/FourchetteManager:1.0"/>
+  <homerepid repid="IDL:DinerDesPhilosophes/FourchetteHome:1.0"/>
+  <componentkind>
+    <session>
+      <servant lifetime="component"/>
+    </session>
+  </componentkind>
+  <security rightscombinator="secanyrights" rightsfamily="CORBA">
+  </security>
+  <threading policy="multithread"/>
+  <configurationcomplete set="true"/>
+  <segment segmenttag="1" name="fourchettemanagerseg">
+    <segmentmember facettag="1"/>
+  </segment>
+  <homefeatures name="FourchetteHome" repid="IDL:DinerDesPhilosophes/FourchetteHome:1.0">
+  </homefeatures>
+  <componentfeatures name="FourchetteManager" repid="IDL:DinerDesPhilosophes/FourchetteManager:1.0">
+    <ports>
+      <provides facettag="1" providesname="la_fourchette" repid="IDL:DinerDesPhilosophes/Fourchette:1.0">
+      </provides>
+    </ports>
+  </componentfeatures>
+  <interface name="Fourchette" repid="IDL:DinerDesPhilosophes/Fourchette:1.0">
+  </interface>
+</corbacomponent>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE corbacomponent PUBLIC "-//OMG//DTD CORBA Component Descriptor 3.0//EN" "http://openccm.objectweb.org/dtd/ccm/corbacomponent.dtd">
+<corbacomponent>
+  <corbaversion>3.0</corbaversion>
+  <componentrepid repid="IDL:DinerDesPhilosophes/Philosophe:1.0"/>
+  <homerepid repid="IDL:DinerDesPhilosophes/PhilosopheHome:1.0"/>
+  <componentkind>
+    <session>
+      <servant lifetime="container"/>
+    </session>
+  </componentkind>
+  <security rightscombinator="secanyrights" rightsfamily="CORBA">
+  </security>
+  <threading policy="multithread"/>
+  <configurationcomplete set="true"/>
+  <segment segmenttag="1" name="philosopheseg">
+    <segmentmember facettag="1"/>
+  </segment>
+  <homefeatures name="PhilosopheHome" repid="IDL:DinerDesPhilosophes/PhilosopheHome:1.0">
+  </homefeatures>
+  <componentfeatures name="Philosophe" repid="IDL:DinerDesPhilosophes/Philosophe:1.0">
+    <ports>
+      <uses usesname="droite" repid="IDL:DinerDesPhilosophes/Fourchette:1.0">
+      </uses>
+      <uses usesname="gauche" repid="IDL:DinerDesPhilosophes/Fourchette:1.0">
+      </uses>
+      <publishes publishesname="info" eventtype="InfoEtat">
+        <eventpolicy policy="normal"/>
+      </publishes>
+    </ports>
+  </componentfeatures>
+  <interface name="Fourchette" repid="IDL:DinerDesPhilosophes/Fourchette:1.0">
+  </interface>
+</corbacomponent>

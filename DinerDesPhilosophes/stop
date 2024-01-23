@@ -1,0 +1,27 @@
+#! /bin/sh
+
+nom_application="DinerDesPhilosophes"
+
+# Arrêt de l'application
+tear_down ${nom_application}
+
+# Arrêt du serveur de composants
+#
+jcs_stop ComponentServer1
+	
+# Arrêt du neoud principal
+#
+node_stop MainNode
+factory_stop DefaultFactory
+dci_stop DefaultDCI
+
+# Arrêt du service de nommage
+ns_stop
+
+# Désinstallation de la plateforme OpenCCM
+#
+ccm_deinstall
+
+# Arrêt de toute instance de Java qui reste
+#
+killall -9 java
